@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Table with Clone</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+<input type="text" id="searchInput" placeholder="Search...">
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Table rows will be added dynamically here -->
+    </tbody>
+</table>
+
+<script>
+$(document).ready(function () {
+    // Fetch JSON data using AJAX
+    $.ajax({
+        url: 'sample.json', // Replace with your JSON file path
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            populateTable(data);
+        },
+        error: function (error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+
+    // Function to populate the table with JSON data
+    function populateTable(data) {
+        var tableBody = $('#dataTable tbody');
+
+        // Clear existing rows
+        tableBody.empty();
+
+        // Populate table with JSON data
+        $.each(data, function (index, item) {
+            var row = $('<tr>');
+            row.append('<td>' + item.name + '</td>');
+            row.append('<td>' + item.age + '</td>');
+            row.append('<td><button class="cloneBtn">Clone</button></td>');
+
+            // Add click event to clone the row data
+            row.find('.cloneBtn').click(function () {
+                var clonedData = { "name": item.name, "age": item.age }; // Create a new object with the desired properties
+                $.ajax({
+                    url: 'new.json', // Replace with your new JSON file path
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(clonedData),
+                    success: function () {
+                        alert('Data cloned and saved: ' + JSON.stringify(clonedData));
+                    },
+                    error: function (error) {
+                        console.error('Error cloning and saving data:', error);
+                    }
+                });
+            });
+
+            // Append row to table
+            tableBody.append(row);
+        });
+    }
+
+    // Implement search functionality
+    $('#searchInput').on('input', function () {
+        var searchTerm = $(this).val().toLowerCase();
+
+        // Filter table rows based on the search term
+        $('#dataTable tbody tr').filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
+        });
+    });
+});
+</script>
+
+</body>
+</html>
