@@ -40,7 +40,7 @@ firebase.initializeApp(firebaseConfig);
 
 $(document).ready(function () {
     // Reference to your Firebase database
-    var database = firebase.database().ref('your_data');
+    var database = firebase.database().ref('checkIn');
 
     // Fetch JSON data from Firebase using Firebase SDK
     database.on('value', function(snapshot) {
