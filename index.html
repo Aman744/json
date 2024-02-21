@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Data Table with Clone</title>
+    <title>JSON to HTML Table</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
@@ -14,7 +14,7 @@
         <tr>
             <th>Name</th>
             <th>Age</th>
-            <th>Action</th>
+            <!-- Add more columns as needed -->
         </tr>
     </thead>
     <tbody>
@@ -49,21 +49,20 @@ $(document).ready(function () {
             var row = $('<tr>');
             row.append('<td>' + item.name + '</td>');
             row.append('<td>' + item.age + '</td>');
-            row.append('<td><button class="cloneBtn">Clone</button></td>');
+            // Add more columns as needed
 
-            // Add click event to clone the row data
-            row.find('.cloneBtn').click(function () {
-                var clonedData = { "name": item.name, "age": item.age }; // Create a new object with the desired properties
+            // Add click event to send data to new JSON file
+            row.click(function () {
                 $.ajax({
                     url: 'new.json', // Replace with your new JSON file path
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(clonedData),
+                    data: JSON.stringify(item),
                     success: function () {
-                        alert('Data cloned and saved: ' + JSON.stringify(clonedData));
+                        console.log('Data sent to new file:', item);
                     },
                     error: function (error) {
-                        console.error('Error cloning and saving data:', error);
+                        console.error('Error sending data to new file:', error);
                     }
                 });
             });
