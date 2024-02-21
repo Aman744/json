@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON to HTML Table</title>
+    <title>JSON Data Table with Clone (Firebase)</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.3.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -14,7 +17,7 @@
         <tr>
             <th>Name</th>
             <th>Age</th>
-            <!-- Add more columns as needed -->
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -23,18 +26,28 @@
 </table>
 
 <script>
+// Initialize Firebase with your project configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyD39Mu-YicDNR3agukNQaVvW1Dt-ikoS1M",
+  authDomain: "json-d5489.firebaseapp.com",
+  projectId: "json-d5489",
+  storageBucket: "json-d5489.appspot.com",
+  messagingSenderId: "35944751264",
+  appId: "1:35944751264:web:9d32f7e0071405f8f8e9c5"
+};
+
+firebase.initializeApp(firebaseConfig);
+
 $(document).ready(function () {
-    // Fetch JSON data using AJAX
-    $.ajax({
-        url: 'sample.json', // Replace with your JSON file path
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            populateTable(data);
-        },
-        error: function (error) {
-            console.error('Error fetching data:', error);
-        }
+    // Reference to your Firebase database
+    var database = firebase.database().ref('your_data');
+
+    // Fetch JSON data from Firebase using Firebase SDK
+    database.on('value', function(snapshot) {
+        var data = snapshot.val();
+        populateTable(data);
+    }, function(error) {
+        console.error('Error fetching data from Firebase:', error);
     });
 
     // Function to populate the table with JSON data
@@ -49,22 +62,12 @@ $(document).ready(function () {
             var row = $('<tr>');
             row.append('<td>' + item.name + '</td>');
             row.append('<td>' + item.age + '</td>');
-            // Add more columns as needed
+            row.append('<td><button class="cloneBtn">Clone</button></td>');
 
-            // Add click event to send data to new JSON file
-            row.click(function () {
-                $.ajax({
-                    url: 'new.json', // Replace with your new JSON file path
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(item),
-                    success: function () {
-                        console.log('Data sent to new file:', item);
-                    },
-                    error: function (error) {
-                        console.error('Error sending data to new file:', error);
-                    }
-                });
+            // Add click event to clone the row data
+            row.find('.cloneBtn').click(function () {
+                var clonedData = { "name": item.name, "age": item.age };
+                saveToFirebase(clonedData);
             });
 
             // Append row to table
@@ -81,6 +84,18 @@ $(document).ready(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
         });
     });
+
+    // Function to save data to Firebase
+    function saveToFirebase(data) {
+        // Push the cloned data to the Firebase database
+        database.push(data, function(error) {
+            if (error) {
+                console.error('Error cloning and saving data to Firebase:', error);
+            } else {
+                alert('Data cloned and saved to Firebase: ' + JSON.stringify(data));
+            }
+        });
+    }
 });
 </script>
 
